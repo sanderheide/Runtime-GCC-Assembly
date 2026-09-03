@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+typedef unsigned int uint;
+
 // Implement this function in x86_asm.S and mips_asm.S
 extern void mat_mul_asm(uint size, uint* a, uint* b , uint* c);
 
