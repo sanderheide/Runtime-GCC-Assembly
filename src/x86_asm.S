@@ -4,41 +4,96 @@
 
 ##############################
 # name: mat_mul_asm
-# 
-# input: 
-#       First arg: int : rdi
-#       Second arg: int : rsi
-#       ...
+#
+# input:
+#       First arg:  uint size : rdi
+#       Second arg: uint* a   : rsi
+#       Third arg:  uint* b   : rdx
+#       Fourth arg: uint* c   : rcx
+#
 # output:
+#       Resultatet lagres i matrise c
 #
 # return:
-#       int: rax
-# modifies: 
-#     
+#       void
+#
+# modifies:
+#       rax, r8, r9, r10, r11
+#
 # notes:
+#       Direkte implementasjon av matrise-multiplikasjonen fra C-koden
 #
 ##############################
 mat_mul_asm:
 
-    
-    # Do something here... 
+    mov     $0, %r8d              # i = 0
 
-#   Example code:
-#   example:
-#       pushq   %rbp
-#       movq    %rsp, %rbp              #####
-#       movl    %edi, -20(%rbp)         # int example(int num, int num2){
-#       movl    %esi, -24(%rbp)         # int a = 0;
-#       movl    $0, -4(%rbp)            # while(num<num2){
-#       jmp     .L2                     #   a++;
-#   .L3:                                # }
-#       addl    $1, -4(%rbp)            # return a;
-#   .L2:                                # }
-#       movl    -20(%rbp), %eax         #####
-#       cmpl    -24(%rbp), %eax         
-#       jl      .L3
-#       movl    -4(%rbp), %eax
-#       popq    %rbp
-#       ret
+i_loop:
+    cmp     %edi, %r8d
+    je      finished
 
+    mov     $0, %r9d              # j = 0
+
+j_loop:
+    cmp     %edi, %r9d
+    je      i_done
+
+    mov     $0, %r10d             # k = 0
+
+k_loop:
+    cmp     %edi, %r10d
+    je      j_done
+
+
+    # a[size*i + k]
+
+    mov     %r8d, %r11d
+    imul    %edi, %r11d
+    add     %r10d, %r11d
+    shl     $2, %r11d
+
+    mov     (%rsi,%r11), %eax
+
+
+    # b[size*k + j]
+
+    mov     %r10d, %r11d
+    imul    %edi, %r11d
+    add     %r9d, %r11d
+    shl     $2, %r11d
+
+    # a[size*i + k] * b[size*k + j]
+
+    imul    (%rdx,%r11), %eax
+
+
+    # c[size*i + j]
+
+    mov     %r8d, %r11d
+    imul    %edi, %r11d
+    add     %r9d, %r11d
+    shl     $2, %r11d
+
+
+    # c[size*i + j] += a[size*i + k] * b[size*k + j]
+
+    add     %eax, (%rcx,%r11)
+
+
+    add     $1, %r10d             # k++
+    jmp     k_loop
+
+
+j_done:
+    add     $1, %r9d              # j++
+    jmp     j_loop
+
+
+i_done:
+    add     $1, %r8d              # i++
+    jmp     i_loop
+
+
+finished:
+    ret
 
