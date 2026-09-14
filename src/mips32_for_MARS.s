@@ -1,6 +1,10 @@
-.text # Code segment
-.global mat_mul_asm # Make this label available in the global symbol table
-.type mat_mul_asm, @function # Declare this label type: function
+.data
+	size: .word 3
+	a: .word 1, 2, 3, 4, 5, 6, 7, 8, 9
+	b: .word 1, 0, 0, 0, 1, 0, 0, 0, 1
+	c: .word 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+.text
 
 main:
 	lw $a0, size
